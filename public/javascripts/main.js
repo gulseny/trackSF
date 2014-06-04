@@ -31,6 +31,15 @@ $(document).ready(function(){
         }
 	});
 
+	//parse vehicle locations data
+    var getCoordinates = function(data){
+        console.log('returned data: ', data);
+        $(data).find('vehicle').each(function(){
+            var lat_lon = [$(this).attr('lon'), $(this).attr('lat')];
+            console.log(lat_lon);
+        });
+    };
+
 	//get vehicle locations from the server
 	var getLocations = function() {
 		$.ajax({

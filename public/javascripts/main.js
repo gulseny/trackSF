@@ -27,33 +27,50 @@ $(document).ready(function(){
                .attr('stroke', 'black')
                .attr('stroke-width', '0.5px');
 
+            //get vehicle locations from the server
+			var getLocations = function() {
+				$.ajax({
+					url: "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=1144953500233",
+					type: "GET",
+					dataType: 'xml',
+					success: function(data){
+						console.log('successfully retrieved data');
+						var coordinates = getCoordinates(data);
+						appendCircles(coordinates);
+					},
+					error: function(error){
+						console.log('error retrieving data', error);
+					}
+				});
+			};
+
+			//parse vehicle locations data
+            var getCoordinates = function(data){
+                console.log('returned data: ', data);
+                var coordinates = [];
+                $(data).find('vehicle').each(function(){
+                    var lat_lon = [$(this).attr('lon'), $(this).attr('lat')];
+                    coordinates.push(lat_lon);
+                });
+                console.log('coordinates: ', coordinates);
+                return coordinates;
+            };
+
+
+            var appendCircles = function(data){
+                svg.selectAll('circle')
+                   .data(data)
+                   .enter()
+                   .append('circle')
+                   .attr('cx', function(d){return projection(d)[0];})
+                   .attr('cy', function(d){return projection(d)[1];})
+                   .attr('r', 5)
+                   .attr('fill', 'green');
+            };
+
             getLocations();
         }
 	});
 
-	//parse vehicle locations data
-    var getCoordinates = function(data){
-        console.log('returned data: ', data);
-        $(data).find('vehicle').each(function(){
-            var lat_lon = [$(this).attr('lon'), $(this).attr('lat')];
-            console.log(lat_lon);
-        });
-    };
-
-	//get vehicle locations from the server
-	var getLocations = function() {
-		$.ajax({
-			url: "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni&r=N&t=1144953500233",
-			type: "GET",
-			dataType: 'xml',
-			success: function(data){
-				console.log('successfully retrieved data');
-				getCoordinates(data);
-			},
-			error: function(error){
-				console.log('error retrieving data', error);
-			}
-		});
-	};
 
 });

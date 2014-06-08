@@ -1,10 +1,10 @@
 $(document).ready(function(){
 
 	//add containing svg to the page
-	var width = 2000;
-	var height = 2000;
+	var width = 3000;
+	var height = 3000;
 
-	var svg = d3.select('body')
+	var svg = d3.select('.map')
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height)
@@ -17,7 +17,7 @@ $(document).ready(function(){
 			console.log('error loading map');
 		} else {
 			console.log('success');
-			var projection = d3.geo.mercator().scale(500000).center(d3.geo.centroid(json)).translate([width/3, height/3]);
+			var projection = d3.geo.mercator().scale(1000000).center(d3.geo.centroid(json)).translate([width/3, height/3]);
 			var path = d3.geo.path().projection(projection);
 			svg.selectAll('path')
                .data(json.features)
@@ -99,7 +99,7 @@ $(document).ready(function(){
                 var vehicles = svg.selectAll('circle')
                    .data(data);
 
-                vehicles.transition().ease('linear').duration(5000)
+                vehicles.transition().ease('linear').duration(3000)
                     .attr('cx', function(d){return projection([d.lon, d.lat])[0];})
                     .attr('cy', function(d){return projection([d.lon, d.lat])[1];});
 
@@ -115,14 +115,14 @@ $(document).ready(function(){
                 vehicles = svg.selectAll('text')
                    .data(data);
 
-                vehicles.transition().ease('linear').duration(5000)
+                vehicles.transition().ease('linear').duration(3000)
                    .attr('x', function(d){return projection([d.lon, d.lat])[0];})
-                   .attr('y', function(d){return projection([d.lon, d.lat])[1];});
+                   .attr('y', function(d){return projection([d.lon, d.lat])[1]+3;});
 
                 vehicles.enter().append('text')
                    .text(function(d){return d.route;})
                    .attr('x', function(d){return projection([d.lon, d.lat])[0];})
-                   .attr('y', function(d){return projection([d.lon, d.lat])[1];})
+                   .attr('y', function(d){return projection([d.lon, d.lat])[1]+3;})
                    .attr('font-size', '9px')
                    .attr('text-anchor', 'middle');
             };
@@ -130,23 +130,10 @@ $(document).ready(function(){
             //initial call to display vehicles
             getLocations();
 
-            // setTimeout(function(){
-            //     getLocations();
-            // }, 11000);
-            // setTimeout(function(){
-            // 	getLocations();
-            // }, 22000);
-            // setTimeout(function(){
-            // 	getLocations();
-            // }, 33000);
-            // setTimeout(function(){
-            // 	getLocations();
-            // }, 44000);
-
             //update vehicle locations periodically
-            // setInterval(function(){
-            //     getLocations();
-            // }, 11000);
+            setInterval(function(){
+                getLocations();
+            }, 11000);
         }
 	});
 

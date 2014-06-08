@@ -2,7 +2,7 @@ $(document).ready(function(){
 
 	//add containing svg to the page
 	var width = 3000;
-	var height = 3000;
+	var height = 1800;
 
 	var svg = d3.select('.map')
                 .append('svg')
@@ -17,7 +17,7 @@ $(document).ready(function(){
 			console.log('error loading map');
 		} else {
 			console.log('success');
-			var projection = d3.geo.mercator().scale(1000000).center(d3.geo.centroid(json)).translate([width/3, height/3]);
+			var projection = d3.geo.mercator().scale(650000).center(d3.geo.centroid(json)).translate([width/3, height/2]);
 			var path = d3.geo.path().projection(projection);
 			svg.selectAll('path')
                .data(json.features)
@@ -70,7 +70,7 @@ $(document).ready(function(){
 
                     var index = vehicleIds.indexOf(id);
                     if(index === -1){
-                    	console.log('creating vehicle object')
+                    	// console.log('creating vehicle object')
                         vehicleIds.push(id);
                         var aVehicle = {
                             id: id,
@@ -82,7 +82,7 @@ $(document).ready(function(){
                         };
                         vehicles.push(aVehicle);
                     } else {
-                        console.log('updating vehicles object for ', vehicles[index].id, ' ', vehicles[index].lon === $(this).attr('lon'), ' ', vehicles[index].lat === $(this).attr('lat'));
+                        // console.log('updating vehicles object for ', vehicles[index].id, ' ', vehicles[index].lon === $(this).attr('lon'), ' ', vehicles[index].lat === $(this).attr('lat'));
                         vehicles[index].route = $(this).attr('routeTag');
                         vehicles[index].dir = $(this).attr('dirTag');
                         vehicles[index].lon = $(this).attr('lon');

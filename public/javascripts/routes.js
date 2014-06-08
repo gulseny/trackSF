@@ -6,6 +6,7 @@ $.ajax({
 	success: function(data){
 		console.log('successfully retrieved data');
 		populateRoutes(data);
+		populateDropDown();
 		console.log('routes assigned: ', routesAll);
 	},
 	error: function(error){
@@ -14,13 +15,18 @@ $.ajax({
 });
 
 var routesAll = {};
+var routesList = [];
+
 var populateRoutes = function(data){
 
 	$(data).find('route').each(function(){
 		var route = $(this).attr('tag');
+		var title = $(this).attr('title');
 		routesAll[route] = {
-			title: $(this).attr('title')
+			title: title
 		};
+
+		routesList.push(title);
 	});
 
 	var colors = d3.scale.category20();
@@ -41,6 +47,38 @@ var populateRoutes = function(data){
 	}
 
 	console.log('routesAll', routesAll);
+	console.log('routesList', routesList, routesList.length);
 
 	return routesAll;
 };
+
+var populateDropDown = function(){
+	var $list = $('.list');
+	$list.append('<select class="selectpicker" multiple title="trains" data-live-search=true></select>');
+
+	var $select = $('select');
+
+	$select.append('<optgroup class="cables" label="cable cars">' + '</optgroup>');
+	var $cables = $('.cables');
+	for(var k = 78; k < 81; k++){
+		$cables.append('<option>' + routesList[k] + '</option>');
+	}
+
+	$select.append('<optgroup class="trains" label="trains">' + '</optgroup>');
+	var $trains = $('.trains');
+	for(var i = 0; i < 7; i++){
+		$trains.append('<option>' + routesList[i] + '</option>');
+	}
+
+	$select.append('<optgroup class="busses" label="busses">' + '</optgroup>');
+	var $busses = $('.busses');
+	for(var j = 7; j < 78; j++){
+		$busses.append('<option>' + routesList[j] + '</option>');
+	}
+
+
+	//enable bootstrap-select
+	$('select').selectpicker();
+};
+
+

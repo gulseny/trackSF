@@ -7,6 +7,8 @@ a {
   color: #00B7FF;
 }
 
-.map {
-	margin-left: 300px;
+.list{
+	position: fixed;
+	top: 100px;
+	left: 100px;
 }

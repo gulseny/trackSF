@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
 	//add containing svg to the page
-	var width = 3000;
+	var width = 2000;
 	var height = 1800;
 	var svg = d3.select('.map')
                 .append('svg')
@@ -15,7 +15,7 @@ $(document).ready(function(){
 			console.log('error loading map');
 		} else {
 			console.log('map load: successful');
-			var projection = d3.geo.mercator().scale(650000).center(d3.geo.centroid(json)).translate([width/3, height/2]);
+			var projection = d3.geo.mercator().scale(600000).center(d3.geo.centroid(json)).translate([width/2.5, height/1.8]);
 			var path = d3.geo.path().projection(projection);
 			svg.selectAll('path')
                .data(json.features)
@@ -40,9 +40,7 @@ $(document).ready(function(){
 					dataType: 'xml',
 					success: function(data){
 						console.log('successfully retrieved routes data');
-						populateRoutes(data);
-						populateDropDown();
-						getLocations();
+						$.when(populateRoutes(data), populateDropDown()).done(getLocations);
 					},
 					error: function(error){
 						console.log('error retrieving routes data', error);
@@ -51,6 +49,8 @@ $(document).ready(function(){
 			};
 
 			var populateRoutes = function(data){
+				var colors = d3.scale.category20();
+
 				$(data).find('route').each(function(){
 					var route = $(this).attr('tag');
 					var title = $(this).attr('title');
@@ -58,13 +58,6 @@ $(document).ready(function(){
 						title: title,
 						tag: route
 					};
-					routesList.push(route);
-				});
-
-				var colors = d3.scale.category20();
-				
-				//assign vehicle type and color to each route
-				for(var route in routes){
 					if(route === '59' || route === '60' || route === '61'){
 						routes[route].type = 'cable';
 					} else if(route === 'F' || route === 'J' || route === 'KT' || route === 'L' ||
@@ -75,7 +68,8 @@ $(document).ready(function(){
 					}
 					var random = Math.floor(Math.random() * 20);
 					routes[route].color = colors(random);
-				}
+					routesList.push(route);
+				});
 			};
 
 			var populateDropDown = function(){
@@ -110,7 +104,6 @@ $(document).ready(function(){
 				var $selection = $('.selectpicker');
 				$selection.on('change', function(){
 					var selectedOptions = $('.selectpicker option:selected');
-					console.log('selectedOptions: ', selectedOptions);
 					filterVehicles(selectedOptions);
 				});
 			};
@@ -125,7 +118,6 @@ $(document).ready(function(){
 				//reassign selectedRoutes
 				var selection = [];
 				for(var i = 0; i < selected.length; i++){
-					console.log(selected[i].className);
 					selection.push(selected[i].className);
 				}
 				selectedRoutes = selection;
@@ -135,7 +127,6 @@ $(document).ready(function(){
 
             //get vehicle locations from the server
 			var getLocations = function() {
-				console.log('selected Routes', selectedRoutes);
 				var url = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=sf-muni';
 				var time = Math.round(new Date().getTime()/1000);
 				var route = '';
@@ -158,8 +149,9 @@ $(document).ready(function(){
 					dataType: 'xml',
 					success: function(data){
 						console.log('successfully retrieved vehicle locations data: ', data);
-						var vehicleInfo = getVehicleInfo(data);
-						showVehicles(vehicleInfo);
+						$.when(getVehicleInfo(data)).done(function(vehicleData){
+							showVehicles(vehicleData);
+						});
 					},
 					error: function(error){
 						console.log('error retrieving data', error);
